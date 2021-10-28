@@ -3,9 +3,6 @@ Runs the Huggingface BertForSequenceClassification model using the Lazy Tensor C
 
 Requirements to run example:
 - `transformers` Python package by HuggingFace
-- `torchvision` Python package
-- `pillow` Python package
-- `requests` Python package
 - `lazy_tensor_core` Python package
     For information on how to obtain the `lazy_tensor_core` Python package,
     see here:
@@ -15,10 +12,10 @@ Requirements to run example:
 To run the example, make sure `/path/to/pytorch/lazy_tensor_core` is in your
 PYTHONPATH. Then, run
 
-    python lazytensor_resnet18_example.py
+    python lazytensor_bert_example.py
 
 The output of this example can be found in
-    `lazytensor_resnet18_example_output.txt`
+    `lazytensor_bert_example_output.txt`
 
 Most of the code in this example was barrowed from
     https://github.com/ramiro050/lazy-tensor-samples/blob/main/lazytensor_resnet18_example.py
@@ -85,11 +82,13 @@ def main():
     print(metrics.metrics_report())
     graph_str = ltc._LAZYC._get_ltc_tensors_backend([bert_module.forward(test_input)])
     print(graph_str)
+    graph = torch._C.parse_ir(graph_str)
+
 
     # Create a torch.jit.ScriptFunction out of the graph
     cu = CompilationUnit()
     func_name = 'my_method'
-    script_function = cu.create_function(func_name, graph_str)
+    script_function = cu.create_function(func_name, graph)
 
 if __name__ == '__main__':
     main()
